@@ -11,7 +11,11 @@ class SplashScreen extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Expanded(
-                child: Center(child: Image.asset('assets/images/logo.png')))
+                child: Center(
+                    child: Container(
+                        width: 128,
+                        height: 128,
+                        child: Image.asset('assets/images/logo.png'))))
           ],
         ));
   }

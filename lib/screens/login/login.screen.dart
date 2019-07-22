@@ -7,6 +7,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _content,
+      backgroundColor: Colors.white,
     );
   }
 
@@ -30,19 +31,21 @@ class LoginScreen extends StatelessWidget {
   // }
 
   Widget get _content {
-    return Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
+    return Column(
+      mainAxisSize: MainAxisSize.max, 
+      children: <Widget>[
       Expanded(
         flex: 60,
         child: LoginGraphicWidget(),
       ),
       Expanded(
-        flex: 30,
+        flex: 40,
         child: LoginFormWidget(),
       ),
-      Expanded(
-        flex: 10,
-        child: Container(),
-      ),
+      // Expanded(
+      //   flex: 10,
+      //   child: Container(),
+      // ),
     ]);
   }
 }

@@ -15,7 +15,10 @@ class LoginFormWidget extends StatelessWidget {
               height: 48,
               minWidth: 200,
               child: RaisedButton.icon(
-                icon: Image.asset('assets/images/g_login_logo.png'),
+                icon: Container(
+                    width: 28,
+                    height: 28,
+                    child: Image.asset('assets/images/g_login_logo.png')),
                 label: Text('Continue with Google'),
                 color: Colors.white,
                 shape: RoundedRectangleBorder(

@@ -32,41 +32,43 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
     };
 
-    return Container(
-      color: Colors.white,
-      child: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Expanded(
-                child: PageView(
-              controller: _controller,
-              children: <Widget>[
-                _Slide(
-                  heading: 'Mindfullness',
-                  description: 'A long long log long long long description',
-                  assetPath: 'assets/videos/mindfulness.mp4',
-                ),
-                _Slide(
-                  heading: 'Changing Habits',
-                  description: 'A long long log long long long description',
-                  assetPath: 'assets/videos/habits.mp4',
-                ),
-                _Slide(
-                  heading: 'Removing Addiction',
-                  description: 'A long long log long long long description',
-                  assetPath: 'assets/videos/addiction.mp4',
-                ),
-              ],
-              onPageChanged: (index) {
-                helperViewModel.setIndex(index);
-              },
-            )),
-            Container(
-              height: 56,
-              child:
-                  _SlidesIndicator(changePageTriggerCallback, helperViewModel),
-            )
-          ],
+    return Scaffold(
+      body: Container(
+        color: Colors.white,
+        child: SafeArea(
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                  child: PageView(
+                controller: _controller,
+                children: <Widget>[
+                  _Slide(
+                    heading: 'Mindfullness',
+                    description: 'A long long log long long long description',
+                    assetPath: 'assets/videos/mindfulness.mp4',
+                  ),
+                  _Slide(
+                    heading: 'Changing Habits',
+                    description: 'A long long log long long long description',
+                    assetPath: 'assets/videos/habits.mp4',
+                  ),
+                  _Slide(
+                    heading: 'Removing Addiction',
+                    description: 'A long long log long long long description',
+                    assetPath: 'assets/videos/addiction.mp4',
+                  ),
+                ],
+                onPageChanged: (index) {
+                  helperViewModel.setIndex(index);
+                },
+              )),
+              Container(
+                height: 56,
+                child: _SlidesIndicator(
+                    changePageTriggerCallback, helperViewModel),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -95,6 +97,7 @@ class __SlideState extends State<_Slide> {
         // Ensure the first frame is shown after the video is initialized,
         // even before the play button has been pressed.
         setState(() {});
+        _controller.play();
       });
   }
 
@@ -103,21 +106,27 @@ class __SlideState extends State<_Slide> {
     return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+          // Spacer
+          Spacer(flex: 8),
+
           // Video
           Expanded(
+              flex: 64,
               child: Container(
-            // color: Colors.red,
-            child: Center(
-              child: _controller.value.initialized
-                  ? AspectRatio(
-                      aspectRatio: _controller.value.aspectRatio,
-                      child: VideoPlayer(_controller),
-                    )
-                  : Container(),
-            ),
-          )),
+                margin: EdgeInsets.all(32),
+                // color: Colors.red,
+                child: Center(
+                  child: _controller.value.initialized
+                      ? AspectRatio(
+                          aspectRatio: _controller.value.aspectRatio,
+                          child: VideoPlayer(_controller),
+                        )
+                      : Container(),
+                ),
+              )),
 
-          // TODO: Use Theming here
+          // Spacer
+          Spacer(flex: 8),
 
           // Heading
           Padding(
@@ -129,6 +138,9 @@ class __SlideState extends State<_Slide> {
                     decoration: TextDecoration.none)),
           ),
 
+          // Spacer
+          // Spacer(flex: 8),
+
           // Description
           Padding(
             padding: const EdgeInsets.all(32.0),
@@ -136,10 +148,19 @@ class __SlideState extends State<_Slide> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 16,
-                    color: Colors.black12,
+                    color: Colors.black38,
                     decoration: TextDecoration.none)),
           ),
+
+          // Spacer
+          Spacer(flex: 8)
         ]);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }
 

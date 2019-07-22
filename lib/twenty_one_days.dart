@@ -11,8 +11,8 @@ class TwentyOneDays extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Set Status Bar Theme
-    SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(statusBarBrightness: Brightness.dark));
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.dark, statusBarColor: Colors.teal));
 
     // Our Material App
     return MaterialApp(

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class AppRoutes {
@@ -9,5 +10,6 @@ class AppRoutes {
 }
 
 class AppColors {
-  static const Color PRIMARY = Color(0xFF1ABC9C);
+  // static const Color PRIMARY = Color(0xFF16a085);
+  static const Color PRIMARY = Colors.teal;
 }

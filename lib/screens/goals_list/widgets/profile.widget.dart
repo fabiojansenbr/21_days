@@ -6,20 +6,30 @@ class ProfileWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            // Spacer
+
+            SizedBox(height: 32),
+
+            // Row
             Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  // Spacer
+                  Spacer(flex: 8),
+
                   // Profile Picture
-                  _ProfilePictureWidget(),
+                  Expanded(child: _ProfilePictureWidget(), flex: 50),
 
                   // Spacer
                   SizedBox(width: 16),
 
                   // User Atrribution
-                  _UserAttribution()
+                  Expanded(child: _UserAttribution(), flex: 60),
+
+                  Spacer(flex: 12)
                 ])
           ]),
     );
@@ -40,10 +50,10 @@ class _UserAttribution extends StatelessWidget {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.6,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           // Spacer
-          SizedBox(height: 8),
+          SizedBox(height: 4),
 
           // Username
           RichText(
@@ -58,8 +68,8 @@ class _UserAttribution extends StatelessWidget {
 
           // Today's motivational Quote
           Text(
-            'Pretty long long long motivational and mind changing quote',
-            textAlign: TextAlign.right,
+            'Motivation gets you going and habit gets you there',
+            textAlign: TextAlign.left,
             style: TextStyle(
               fontWeight: FontWeight.w300,
               fontSize: 18,
