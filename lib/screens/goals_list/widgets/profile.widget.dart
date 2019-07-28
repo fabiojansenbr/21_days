@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:twenty_one_days/utilities/storage_helper.dart';
 
 class ProfileWidget extends StatelessWidget {
   @override
@@ -36,15 +37,58 @@ class ProfileWidget extends StatelessWidget {
   }
 }
 
-class _ProfilePictureWidget extends StatelessWidget {
+class _ProfilePictureWidget extends StatefulWidget {
+  @override
+  __ProfilePictureWidgetState createState() => __ProfilePictureWidgetState();
+}
+
+class __ProfilePictureWidgetState extends State<_ProfilePictureWidget> {
+  bool isMaleAvatar;
+
+  @override
+  void initState() {
+    super.initState();
+    _getAvatar();
+  }
+
+  _getAvatar() async {
+    isMaleAvatar = await StorageHelper().getAvatar();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-        radius: 56, child: Image.asset('assets/images/sample_profile.png'));
+    if (isMaleAvatar != null) {
+      return CircleAvatar(
+          radius: 56,
+          child: isMaleAvatar
+              ? Image.asset('assets/images/male.png')
+              : Image.asset('assets/images/female.png'));
+    } else {
+      return Container();
+    }
   }
 }
 
-class _UserAttribution extends StatelessWidget {
+class _UserAttribution extends StatefulWidget {
+  @override
+  __UserAttributionState createState() => __UserAttributionState();
+}
+
+class __UserAttributionState extends State<_UserAttribution> {
+  String name;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadName();
+  }
+
+  _loadName() async {
+    name = await StorageHelper().getName();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -62,7 +106,7 @@ class _UserAttribution extends StatelessWidget {
                 text: 'Hi ',
                 style: TextStyle(fontWeight: FontWeight.w300, fontSize: 24)),
             TextSpan(
-                text: 'Devashish',
+                text: name ?? '',
                 style: TextStyle(fontWeight: FontWeight.w500, fontSize: 24)),
           ])),
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:twenty_one_days/constants.dart';
+import 'package:twenty_one_days/utilities/storage_helper.dart';
 
 class SplashScreen extends StatelessWidget {
   @override
@@ -21,7 +22,13 @@ class SplashScreen extends StatelessWidget {
   }
 
   _navigate(BuildContext ctx) async {
-    await Future.delayed(Duration(seconds: 3));
-    Navigator.pushReplacementNamed(ctx, AppRoutes.ONBOARDING);
+    final String name = await StorageHelper().getName();
+    await Future.delayed(Duration(seconds: 2));
+    if (name != null && name.isNotEmpty) {
+      Navigator.pushReplacementNamed(ctx, AppRoutes.GOALS_LIST);
+    } else {
+      Navigator.pushReplacementNamed(ctx, AppRoutes.ONBOARDING);
+    }
+    // Navigator.pushReplacementNamed(ctx, AppRoutes.ONBOARDING);
   }
 }

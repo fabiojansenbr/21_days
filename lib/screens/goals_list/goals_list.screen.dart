@@ -1,11 +1,14 @@
-import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'package:scoped_model/scoped_model.dart';
+
 import 'package:twenty_one_days/constants.dart';
+import 'package:twenty_one_days/screens/goal_details/goal_details.screen.dart';
 import 'package:twenty_one_days/screens/goals_list/goals_list.models.dart';
+import 'package:twenty_one_days/screens/goals_list/goals_list.view_model.dart';
 import 'package:twenty_one_days/screens/goals_list/widgets/goals_list_bottom_sheet.widget.dart';
 import 'package:twenty_one_days/screens/goals_list/widgets/profile.widget.dart';
+import 'package:twenty_one_days/utilities/utilities.dart';
 
 class GoalsListScreen extends StatefulWidget {
   @override
@@ -15,27 +18,31 @@ class GoalsListScreen extends StatefulWidget {
 class _GoalsListScreenState extends State<GoalsListScreen> {
   bool textHidden = true;
   ScrollController _controller = ScrollController();
+  GoalsListViewModel model;
 
   @override
   void initState() {
     super.initState();
 
-    _controller.addListener(() {
-      if (_controller.hasClients &&
-          _controller.offset > (200 - kToolbarHeight)) {
-        if (textHidden) {
-          setState(() {
-            textHidden = false;
-          });
-        }
-      } else {
-        if (!textHidden) {
-          setState(() {
-            textHidden = true;
-          });
-        }
+    _controller.addListener(_computeAppTitleVisibilty);
+
+    model = GoalsListViewModel();
+  }
+
+  _computeAppTitleVisibilty() {
+    if (_controller.hasClients && _controller.offset > (200 - kToolbarHeight)) {
+      if (textHidden) {
+        setState(() {
+          textHidden = false;
+        });
       }
-    });
+    } else {
+      if (!textHidden) {
+        setState(() {
+          textHidden = true;
+        });
+      }
+    }
   }
 
   _openSheet() async {
@@ -49,6 +56,7 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
     );
 
     if (newGoal != null) {
+      model.addNewGoal(newGoal);
       print('The Goal is ${newGoal.title}');
     }
   }
@@ -80,7 +88,7 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
                 ),
               ),
-              backgroundColor: AppColors.PRIMARY,
+              // backgroundColor: AppColors.PRIMARY,
               floating: false,
               pinned: true,
               expandedHeight: 216,
@@ -103,7 +111,13 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
             ),
 
             // Sliver Fixed Extent
-            SliverList(delegate: SliverChildListDelegate(_list))
+            ScopedModel<GoalsListViewModel>(
+              model: model,
+              child: ScopedModelDescendant<GoalsListViewModel>(
+                  builder: (context, widget, model) {
+                return SliverList(delegate: SliverChildListDelegate(_list));
+              }),
+            )
           ],
         ),
       ),
@@ -112,20 +126,41 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
 
   List<Widget> get _list {
     List<Widget> _children = [];
-    for (int i = 0; i < 18; i++) {
-      int progress = Random().nextInt(21);
-      if (progress != 0) {
-        _children.add(ListTile(
-            leading: CircularProgressIndicator(
-              value: ((21 - progress) / 21),
-              backgroundColor: Colors.black26,
-            ),
-            title: Text('Awesome Goal'),
-            subtitle: Text('$progress days left'),
-            trailing: IconButton(icon: Icon(Icons.done), onPressed: () {})));
-      }
+    if (model.goals != null && model.goals.isNotEmpty) {
+      // Add Children for Goals List
+      model.goals.forEach((goal) {
+        int daysLeft = Utils.getDaysLeft(goal);
+        _children.add(InkWell(
+          onTap: () async {
+            GoalDetailResponse res = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => GoalsDetailsScreen(),
+                    settings: RouteSettings(
+                        arguments: GoalDetailArgument(goal: goal))));
+
+            if (res != null && res.isGoalDeleted) {
+              model.removeGoal(res.goal);
+            }
+          },
+          child: ListTile(
+              leading: CircularProgressIndicator(
+                value: Utils.getProgressValue(daysLeft),
+                backgroundColor: Colors.black26,
+              ),
+              title: Text(goal.title ?? ''),
+              subtitle: Text('$daysLeft days left'),
+              trailing: IconButton(icon: Icon(Icons.done), onPressed: () {})),
+        ));
+      });
+
+      // Add Spacer for FAB
+      _children.add(SizedBox(height: 64));
+    } else {
+      _children.add(Container(
+          padding: EdgeInsets.all(32),
+          child: Center(child: Text('No Goals. Please add one'))));
     }
-    _children.add(SizedBox(height: 64));
     return _children;
   }
 }

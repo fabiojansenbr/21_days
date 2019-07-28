@@ -13,3 +13,8 @@ class AppColors {
   // static const Color PRIMARY = Color(0xFF16a085);
   static const Color PRIMARY = Colors.teal;
 }
+
+class StorageKeys {
+  static const String name = 'name';
+  static const String avatar = 'avatar';
+}

@@ -8,8 +8,9 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="twenty_one_days"
-        android:icon="@mipmap/ic_launcher">
+        android:label="21 Days"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_circle">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

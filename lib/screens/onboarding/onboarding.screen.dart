@@ -43,18 +43,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 controller: _controller,
                 children: <Widget>[
                   _Slide(
-                    heading: 'Mindfullness',
-                    description: 'A long long log long long long description',
+                    heading: 'Introduce Healthy Habits',
+                    description:
+                        '''There’s nothing you can’t do if you get the habits right. Introduce a healthy habit in your life with 21 day challenge.''',
                     assetPath: 'assets/videos/mindfulness.mp4',
                   ),
                   _Slide(
-                    heading: 'Changing Habits',
-                    description: 'A long long log long long long description',
+                    heading: 'Change Bad Habits',
+                    description:
+                        '''You can change a bad habit by replacing it with a good habit. This app allows you to do that with 21 day challenge.''',
                     assetPath: 'assets/videos/habits.mp4',
                   ),
                   _Slide(
-                    heading: 'Removing Addiction',
-                    description: 'A long long log long long long description',
+                    heading: 'Overcome Addiction',
+                    description:
+                        '''Want  to limit social media use? Quit Smoking? Just don’t do it for 21 days and transform your lifestyle ''',
                     assetPath: 'assets/videos/addiction.mp4',
                   ),
                 ],
@@ -134,6 +137,7 @@ class __SlideState extends State<_Slide> {
             child: Text(widget.heading ?? '',
                 style: TextStyle(
                     fontSize: 20,
+                    fontWeight: FontWeight.w500,
                     color: Colors.black,
                     decoration: TextDecoration.none)),
           ),
@@ -145,10 +149,10 @@ class __SlideState extends State<_Slide> {
           Padding(
             padding: const EdgeInsets.all(32.0),
             child: Text(widget.description ?? '',
-                textAlign: TextAlign.center,
+                textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 16,
-                    color: Colors.black38,
+                    color: Colors.black54,
                     decoration: TextDecoration.none)),
           ),
 
