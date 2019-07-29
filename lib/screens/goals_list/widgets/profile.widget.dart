@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:twenty_one_days/utilities/storage_helper.dart';
@@ -78,6 +80,14 @@ class _UserAttribution extends StatefulWidget {
 class __UserAttributionState extends State<_UserAttribution> {
   String name;
 
+  final List<String> quotes = [
+    'Motivation gets you going and habit gets you there.',
+    'Best way to break a habit is to drop it.',
+    '21 days from now, you will thank yourself.',
+    'Believe you can and you’re halfway there.',
+    'Will it be easy ? Nope. Worth it ? Absolutely!'
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -112,7 +122,7 @@ class __UserAttributionState extends State<_UserAttribution> {
 
           // Today's motivational Quote
           Text(
-            'Motivation gets you going and habit gets you there',
+            quotes[Random().nextInt(4)],
             textAlign: TextAlign.left,
             style: TextStyle(
               fontWeight: FontWeight.w300,

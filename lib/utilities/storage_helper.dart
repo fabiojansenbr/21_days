@@ -64,7 +64,7 @@ class StorageHelper {
     }
   }
 
-  addGoal(Goal goal) async {
+  Future<int> addGoal(Goal goal) async {
     final dbJson = goal.toDbJson;
     return (await db).rawInsert(
         'INSERT INTO goals (title, timeToRemind, start) VALUES (?, ?, ?)',
@@ -90,6 +90,15 @@ class StorageHelper {
       dbVals.forEach((val) => _goals.add(Goal.fromDbJson(val)));
     }
     return _goals;
+  }
+
+  Future<Goal> fetchGoalById(int id) async {
+    final dbVal =
+        await (await db).rawQuery('SELECT * FROM goals WHERE id = ?', [id]);
+    if (dbVal != null && dbVal.isNotEmpty) {
+      return Goal.fromDbJson(dbVal[0]);
+    }
+    return null;
   }
 
   getName() async {

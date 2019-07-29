@@ -6,10 +6,14 @@ import 'package:twenty_one_days/screens/goals_list/goals_list.screen.dart';
 import 'package:twenty_one_days/screens/login/login.screen.dart';
 import 'package:twenty_one_days/screens/onboarding/onboarding.screen.dart';
 import 'package:twenty_one_days/screens/splash/splash.screen.dart';
+import 'package:twenty_one_days/utilities/push_helper.dart';
 
 class TwentyOneDays extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // Init Push Helper
+    PushHelper().init(context);
+
     // Set Status Bar Theme
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark, statusBarColor: Colors.teal));

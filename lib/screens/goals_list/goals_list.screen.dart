@@ -8,6 +8,7 @@ import 'package:twenty_one_days/screens/goals_list/goals_list.models.dart';
 import 'package:twenty_one_days/screens/goals_list/goals_list.view_model.dart';
 import 'package:twenty_one_days/screens/goals_list/widgets/goals_list_bottom_sheet.widget.dart';
 import 'package:twenty_one_days/screens/goals_list/widgets/profile.widget.dart';
+import 'package:twenty_one_days/utilities/push_helper.dart';
 import 'package:twenty_one_days/utilities/utilities.dart';
 
 class GoalsListScreen extends StatefulWidget {
@@ -63,6 +64,8 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    PushHelper().context = context;
+
     return Container(
       // color: Colors.white,
       child: Scaffold(

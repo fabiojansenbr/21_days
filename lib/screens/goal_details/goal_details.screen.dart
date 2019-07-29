@@ -1,15 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:twenty_one_days/screens/goal_details/widgets/goal_progress.dart';
 import 'package:twenty_one_days/screens/goals_list/goals_list.models.dart';
+import 'package:twenty_one_days/utilities/push_helper.dart';
 import 'package:twenty_one_days/utilities/storage_helper.dart';
-import 'package:twenty_one_days/utilities/utilities.dart';
 
-class GoalsDetailsScreen extends StatelessWidget {
+class GoalsDetailsScreen extends StatefulWidget {
+  @override
+  _GoalsDetailsScreenState createState() => _GoalsDetailsScreenState();
+}
+
+class _GoalsDetailsScreenState extends State<GoalsDetailsScreen> {
+  TimeOfDay timeToRemind;
+  final TextEditingController _textEditingController = TextEditingController();
+  double height;
+  GoalDetailArgument args;
+
   @override
   Widget build(BuildContext context) {
-    final GoalDetailArgument args = ModalRoute.of(context).settings.arguments;
-    int daysLeft = Utils.getDaysLeft(args.goal);
-    double progressWidth = MediaQuery.of(context).size.width * 0.64;
-    double percentage = Utils.getProgressValue(daysLeft);
+    args = ModalRoute.of(context).settings.arguments;
+
+    timeToRemind = args.goal.remindAt;
+    final _timeChooser = () async {
+      final TimeOfDay _timeToRemind = await showTimePicker(
+          context: context, initialTime: TimeOfDay(hour: 7, minute: 0));
+      if (_timeToRemind != null) {
+        setState(() {
+          timeToRemind = _timeToRemind;
+        });
+      }
+    };
+
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -19,84 +39,43 @@ class GoalsDetailsScreen extends StatelessWidget {
               icon: Icon(Icons.delete),
               onPressed: () {
                 StorageHelper().deleteGoal(args.goal.id);
+                PushHelper().cancelNotification(args.goal.id);
                 Navigator.of(context).pop(GoalDetailResponse(args.goal, true));
               },
             )
           ],
         ),
-        body: Container(
-          padding: EdgeInsets.fromLTRB(16, 32, 16, 32),
-          width: MediaQuery.of(context).size.width,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            // mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              // Goal Title
-              Text(
-                args.goal.title ?? '',
-                style: TextStyle(
-                    fontSize: 24,
-                    // fontWeight: FontWeight.w500,
-                    color: Colors.black87),
-                textAlign: TextAlign.center,
-              ),
+        body: _scrollableContent);
+  }
 
-              // Spacer
-              SizedBox(height: 64),
-
-              // Goal Progress
-              Container(
-                  height: progressWidth,
-                  width: progressWidth,
-                  child: Stack(
-                    children: <Widget>[
-                      // Progress Bar
-                      Container(
-                        width: progressWidth,
-                        height: progressWidth,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 16,
-                            backgroundColor: Colors.black12,
-                            value: percentage),
-                      ),
-
-                      // Percentage
-                      Container(
-                        height: progressWidth,
-                        width: progressWidth,
-                        child: Center(
-                            child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              '${(percentage * 100).truncate()}%',
-                              style: TextStyle(fontSize: 40),
-                            ),
-                            Text('CONQUERED', style: TextStyle(fontSize: 12))
-                          ],
-                        )),
-                      )
-                    ],
-                  )),
-
-              //Spacer
-              SizedBox(height: 64),
-
-              // Days Remaining
-              RichText(
-                  text: TextSpan(children: [
-                TextSpan(
-                    text: '$daysLeft',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 24,
-                        color: Colors.black)),
-                TextSpan(
-                    text: ' days left',
-                    style: TextStyle(fontSize: 24, color: Colors.black54)),
-              ])),
-            ],
+  Widget get _scrollableContent {
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints viewportConstraints) {
+      if (height == null) {
+        height = viewportConstraints.maxHeight;
+      }
+      return SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+              minHeight: height,
+              maxHeight: height,
+              minWidth: viewportConstraints.maxWidth),
+          child: Container(
+            color: Colors.white,
+            child: IntrinsicHeight(
+              child: _getContent(context),
+            ),
           ),
-        ));
+        ),
+      );
+    });
+  }
+
+  Widget _getContent(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(16, 32, 16, 32),
+      width: MediaQuery.of(context).size.width,
+      child: GoalProgressWidget(args.goal),
+    );
   }
 }
