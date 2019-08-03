@@ -11,6 +11,9 @@ class GoalsListViewModel extends Model {
 
   Future<void> _fetchData() async {
     goals = await StorageHelper().fetchGoals();
+    if (goals.isNotEmpty) {
+      StorageHelper.hadGoalsState = true;
+    }
     notifyListeners();
   }
 
@@ -20,6 +23,7 @@ class GoalsListViewModel extends Model {
       goal.id = goalId;
       goals.add(goal);
       PushHelper().scheduleNotification(goal);
+      StorageHelper.hadGoalsState = true;
       notifyListeners();
     } catch (_) {
       print('Error Occured');

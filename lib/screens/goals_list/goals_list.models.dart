@@ -5,19 +5,20 @@ class Goal {
   String title;
   TimeOfDay remindAt;
   int start;
+  int lastMarkAsCompletedAt;
+  String replacingWith;
 
-  Goal(
-    this.title,
-    this.remindAt,
-  ) {
+  Goal(this.title, this.remindAt, {this.replacingWith}) {
     start = DateTime.now().millisecondsSinceEpoch;
-    // start = (DateTime.now().subtract(Duration(days: 4))).millisecondsSinceEpoch;
+    // start = (DateTime.now().subtract(Duration(days: 20))).millisecondsSinceEpoch;
   }
 
   Goal.fromDbJson(Map<String, dynamic> dbJson) {
     id = dbJson['id'];
     title = dbJson['title'];
     start = dbJson['start'];
+    replacingWith = dbJson['replaceWith'];
+    lastMarkAsCompletedAt = dbJson['lastMarkAsCompletedAt'];
     remindAt = TimeOfDay.fromDateTime(
         DateTime.fromMillisecondsSinceEpoch(dbJson['timeToRemind']));
   }
@@ -28,13 +29,19 @@ class Goal {
         DateTime(now.year, now.month, now.day, remindAt.hour, remindAt.minute);
     int calculatdRemindAt = temp.millisecondsSinceEpoch;
 
-    return {'title': title, 'remindAt': calculatdRemindAt, 'start': start};
+    return {
+      'title': title,
+      'remindAt': calculatdRemindAt,
+      'start': start,
+      'lastMarkAsCompletedAt': lastMarkAsCompletedAt,
+      'replaceWith': replacingWith
+    };
   }
 
   DateTime get remindAtDateTime {
     final now = DateTime.now();
     final started = DateTime.fromMillisecondsSinceEpoch(start);
-    if (started.hour > now.hour && started.day == now.day) {
+    if (started.hour >= now.hour && started.day == now.day) {
       return DateTime(started.year, started.month, started.day, remindAt.hour,
           remindAt.minute);
     } else {

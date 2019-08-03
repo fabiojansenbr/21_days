@@ -33,7 +33,7 @@ class StorageHelper {
       // When the database is first created, create a table to store dogs.
       onCreate: (db, version) async {
         await db.execute(
-          "CREATE TABLE IF NOT EXISTS goals(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, timeToRemind INTEGER, start INTEGER)",
+          "CREATE TABLE IF NOT EXISTS goals(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, timeToRemind INTEGER, start INTEGER, lastMarkAsCompletedAt INTEGER, replaceWith TEXT)",
         );
 
         await db.execute(
@@ -67,15 +67,28 @@ class StorageHelper {
   Future<int> addGoal(Goal goal) async {
     final dbJson = goal.toDbJson;
     return (await db).rawInsert(
-        'INSERT INTO goals (title, timeToRemind, start) VALUES (?, ?, ?)',
-        [dbJson['title'], dbJson['remindAt'], dbJson['start']]);
+        'INSERT INTO goals (title, timeToRemind, start, lastMarkAsCompletedAt, replaceWith) VALUES (?, ?, ?, ?, ?)',
+        [
+          dbJson['title'],
+          dbJson['remindAt'],
+          dbJson['start'],
+          dbJson['lastMarkAsCompletedAt'],
+          dbJson['replaceWith']
+        ]);
   }
 
   updateGoal(Goal goal) async {
     final dbJson = goal.toDbJson;
     return (await db).rawInsert(
-        'INSERT INTO goals (title, timeToRemind, start) VALUES (?, ?, ?)',
-        [dbJson['title'], dbJson['remindAt'], dbJson['start']]);
+        'UPDATE goals SET title = ?, timeToRemind = ?, start = ?, lastMarkAsCompletedAt = ?, replaceWith = ? WHERE id = ?',
+        [
+          dbJson['title'],
+          dbJson['remindAt'],
+          dbJson['start'],
+          dbJson['lastMarkAsCompletedAt'],
+          dbJson['replaceWith'],
+          goal.id,
+        ]);
   }
 
   deleteGoal(int id) async {
@@ -116,4 +129,16 @@ class StorageHelper {
   setAvatar(bool isMale) async {
     this._save(StorageKeys.avatar, isMale);
   }
+
+  getGoalsCompleted() async {
+    return this._get(StorageKeys.goalsCompleted);
+  }
+
+  setGoalsCompleted(int count) async {
+    this._save(StorageKeys.goalsCompleted, count);
+  }
+
+  // Required to keep track if user added
+  // some goals before we got empty state.
+  static bool hadGoalsState = false;
 }

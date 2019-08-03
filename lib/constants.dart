@@ -17,4 +17,5 @@ class AppColors {
 class StorageKeys {
   static const String name = 'name';
   static const String avatar = 'avatar';
+  static const String goalsCompleted = 'goalsCompleted';
 }

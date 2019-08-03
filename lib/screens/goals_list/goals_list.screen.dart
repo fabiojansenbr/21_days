@@ -4,11 +4,13 @@ import 'package:scoped_model/scoped_model.dart';
 
 import 'package:twenty_one_days/constants.dart';
 import 'package:twenty_one_days/screens/goal_details/goal_details.screen.dart';
+import 'package:twenty_one_days/screens/goal_details/widgets/day_complete_dialog.widget.dart';
 import 'package:twenty_one_days/screens/goals_list/goals_list.models.dart';
 import 'package:twenty_one_days/screens/goals_list/goals_list.view_model.dart';
 import 'package:twenty_one_days/screens/goals_list/widgets/goals_list_bottom_sheet.widget.dart';
 import 'package:twenty_one_days/screens/goals_list/widgets/profile.widget.dart';
 import 'package:twenty_one_days/utilities/push_helper.dart';
+import 'package:twenty_one_days/utilities/storage_helper.dart';
 import 'package:twenty_one_days/utilities/utilities.dart';
 
 class GoalsListScreen extends StatefulWidget {
@@ -65,6 +67,9 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
   @override
   Widget build(BuildContext context) {
     PushHelper().context = context;
+    if (!PushHelper().canNavigate.isCompleted) {
+      PushHelper().canNavigate.complete();
+    }
 
     return Container(
       // color: Colors.white,
@@ -153,7 +158,11 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
               ),
               title: Text(goal.title ?? ''),
               subtitle: Text('$daysLeft days left'),
-              trailing: IconButton(icon: Icon(Icons.done), onPressed: () {})),
+              trailing: Utils.canMarkAsComplete(goal)
+                  ? IconButton(
+                      icon: Icon(Icons.done),
+                      onPressed: () => _markAsComplete(goal))
+                  : SizedBox(width: 48)),
         ));
       });
 
@@ -162,8 +171,38 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
     } else {
       _children.add(Container(
           padding: EdgeInsets.all(32),
-          child: Center(child: Text('No Goals. Please add one'))));
+          child: Center(
+              child: ConstrainedBox(
+            constraints: BoxConstraints(
+                maxWidth: StorageHelper.hadGoalsState
+                    ? MediaQuery.of(context).size.width * 0.64
+                    : MediaQuery.of(context).size.width * 0.48),
+            child: Image.asset(StorageHelper.hadGoalsState
+                ? 'assets/images/all_done.png'
+                : 'assets/images/no_goals.png'),
+          ))));
     }
     return _children;
+  }
+
+  _markAsComplete(Goal goal) async {
+    goal.lastMarkAsCompletedAt = DateTime.now().millisecondsSinceEpoch;
+    final bool are21DaysOver = Utils.getDaysLeft(goal) == 1;
+    await StorageHelper().updateGoal(goal);
+    await showDialog(
+        context: context,
+        builder: (_) {
+          return DayCompleteDialogWidget(are21DaysCompleted: are21DaysOver);
+        });
+    if (are21DaysOver) {
+      _deleteGoal(goal);
+    }
+    setState(() {});
+  }
+
+  _deleteGoal(Goal goal) {
+    StorageHelper().deleteGoal(goal.id);
+    PushHelper().cancelNotification(goal.id);
+    model.goals.remove(goal);
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:twenty_one_days/screens/goal_details/goal_details.screen.dart';
@@ -8,6 +10,7 @@ class PushHelper {
   static final PushHelper _singleton = new PushHelper._internal();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   BuildContext context;
+  Completer<void> canNavigate = Completer();
 
   factory PushHelper() {
     return _singleton;
@@ -34,7 +37,7 @@ class PushHelper {
     }
 
     final Goal goal = await StorageHelper().fetchGoalById(int.parse(payload));
-    await Future.delayed(Duration(seconds: 4));
+    await canNavigate.future;
     await Navigator.push(
       context,
       new MaterialPageRoute(
@@ -61,18 +64,18 @@ class PushHelper {
     await flutterLocalNotificationsPlugin.cancel(id);
   }
 
-  _showPush() async {
-    final androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'your channel id', 'your channel name', 'your channel description',
-        importance: Importance.Max,
-        priority: Priority.High,
-        ongoing: true,
-        ticker: 'ticker');
-    final iOSPlatformChannelSpecifics = IOSNotificationDetails();
-    final platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-        0, 'plain title', 'plain body', platformChannelSpecifics,
-        payload: 'item x');
-  }
+  // _showPush() async {
+  //   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
+  //       'your channel id', 'your channel name', 'your channel description',
+  //       importance: Importance.Max,
+  //       priority: Priority.High,
+  //       ongoing: true,
+  //       ticker: 'ticker');
+  //   final iOSPlatformChannelSpecifics = IOSNotificationDetails();
+  //   final platformChannelSpecifics = NotificationDetails(
+  //       androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+  //   await flutterLocalNotificationsPlugin.show(
+  //       0, 'plain title', 'plain body', platformChannelSpecifics,
+  //       payload: 'item x');
+  // }
 }

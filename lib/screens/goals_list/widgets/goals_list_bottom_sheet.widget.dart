@@ -10,6 +10,7 @@ class AddGoalBottomSheetWidget extends StatefulWidget {
 class _AddGoalBottomSheetState extends State<AddGoalBottomSheetWidget> {
   TimeOfDay timeToRemind;
   String title;
+  String replacingWith;
 
   @override
   Widget build(BuildContext context) {
@@ -44,20 +45,33 @@ class _AddGoalBottomSheetState extends State<AddGoalBottomSheetWidget> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                // TextField
+                // Title TextField
                 Expanded(
                   child: TextField(
-                    // onEditingComplete: () {
-                    //   // _timeChooser();
-                    // },
+                    // onEditingComplete: () => _timeChooser(),
                     onChanged: (value) => title = value,
                     autofocus: true,
                     decoration: InputDecoration(
                         hintText: 'Add a new goal', border: InputBorder.none),
                   ),
-                ),
+                )
               ],
             ),
+
+            // Row(
+            //   children: <Widget>[
+            //     // Replace with TextField
+            //     Expanded(
+            //       child: TextField(
+            //         // onEditingComplete: () => _timeChooser(),
+            //         onChanged: (value) => replacingWith = value,
+            //         decoration: InputDecoration(
+            //             hintText: 'Replace with (Optional)',
+            //             border: InputBorder.none),
+            //       ),
+            //     )
+            //   ],
+            // ),
 
             // Submit  Button
             Row(children: <Widget>[

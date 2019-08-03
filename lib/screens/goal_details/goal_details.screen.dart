@@ -1,8 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:twenty_one_days/constants.dart';
+import 'package:twenty_one_days/screens/goal_details/widgets/day_complete_dialog.widget.dart';
 import 'package:twenty_one_days/screens/goal_details/widgets/goal_progress.dart';
 import 'package:twenty_one_days/screens/goals_list/goals_list.models.dart';
 import 'package:twenty_one_days/utilities/push_helper.dart';
 import 'package:twenty_one_days/utilities/storage_helper.dart';
+import 'package:twenty_one_days/utilities/utilities.dart';
 
 class GoalsDetailsScreen extends StatefulWidget {
   @override
@@ -11,24 +15,13 @@ class GoalsDetailsScreen extends StatefulWidget {
 
 class _GoalsDetailsScreenState extends State<GoalsDetailsScreen> {
   TimeOfDay timeToRemind;
-  final TextEditingController _textEditingController = TextEditingController();
   double height;
   GoalDetailArgument args;
 
   @override
   Widget build(BuildContext context) {
     args = ModalRoute.of(context).settings.arguments;
-
     timeToRemind = args.goal.remindAt;
-    final _timeChooser = () async {
-      final TimeOfDay _timeToRemind = await showTimePicker(
-          context: context, initialTime: TimeOfDay(hour: 7, minute: 0));
-      if (_timeToRemind != null) {
-        setState(() {
-          timeToRemind = _timeToRemind;
-        });
-      }
-    };
 
     return Scaffold(
         backgroundColor: Colors.white,
@@ -37,15 +30,17 @@ class _GoalsDetailsScreenState extends State<GoalsDetailsScreen> {
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.delete),
-              onPressed: () {
-                StorageHelper().deleteGoal(args.goal.id);
-                PushHelper().cancelNotification(args.goal.id);
-                Navigator.of(context).pop(GoalDetailResponse(args.goal, true));
-              },
+              onPressed: _deleteGoal,
             )
           ],
         ),
         body: _scrollableContent);
+  }
+
+  _deleteGoal() {
+    StorageHelper().deleteGoal(args.goal.id);
+    PushHelper().cancelNotification(args.goal.id);
+    Navigator.of(context).pop(GoalDetailResponse(args.goal, true));
   }
 
   Widget get _scrollableContent {
@@ -57,9 +52,7 @@ class _GoalsDetailsScreenState extends State<GoalsDetailsScreen> {
       return SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(
-              minHeight: height,
-              maxHeight: height,
-              minWidth: viewportConstraints.maxWidth),
+              minHeight: height, minWidth: viewportConstraints.maxWidth),
           child: Container(
             color: Colors.white,
             child: IntrinsicHeight(
@@ -72,10 +65,69 @@ class _GoalsDetailsScreenState extends State<GoalsDetailsScreen> {
   }
 
   Widget _getContent(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(16, 32, 16, 32),
-      width: MediaQuery.of(context).size.width,
-      child: GoalProgressWidget(args.goal),
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        // Goal Details
+        Padding(
+          padding: const EdgeInsets.fromLTRB(32, 32, 32, 32),
+          child: GoalProgressWidget(args.goal),
+        ),
+
+        // Call to action
+        Utils.canMarkAsComplete(args.goal)
+            ? ButtonTheme(
+                height: 48,
+                minWidth: 216,
+                child: RaisedButton(
+                  color: AppColors.PRIMARY,
+                  textColor: Colors.white,
+                  child: Text('Mark as Complete'),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(64)),
+                  onPressed: () => _markAsComplete(args.goal),
+                ),
+              )
+            : Container(),
+
+        // Oops Button
+        Utils.canMarkAsComplete(args.goal)
+            ? Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: FlatButton(
+                  child: Text('Missed it! Start Again'),
+                  textColor: AppColors.PRIMARY,
+                  onPressed: () => _startAgain(args.goal),
+                ),
+              )
+            : Container(),
+
+        SizedBox(height: 32)
+      ],
     );
+  }
+
+  _startAgain(Goal goal) async {
+    bool startAgain =
+        await Utils.showConfirm(context, 'Restart goal progress?');
+    if (startAgain) {
+      goal.start = DateTime.now().millisecondsSinceEpoch;
+      await StorageHelper().updateGoal(goal);
+      setState(() {});
+    }
+  }
+
+  _markAsComplete(Goal goal) async {
+    goal.lastMarkAsCompletedAt = DateTime.now().millisecondsSinceEpoch;
+    final bool are21DaysOver = Utils.getDaysLeft(goal) == 1;
+    await StorageHelper().updateGoal(goal);
+    await showDialog(
+        context: context,
+        builder: (_) {
+          return DayCompleteDialogWidget(are21DaysCompleted: are21DaysOver);
+        });
+    if (are21DaysOver) {
+      _deleteGoal();
+    }
   }
 }

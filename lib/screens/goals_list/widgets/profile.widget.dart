@@ -80,7 +80,7 @@ class _UserAttribution extends StatefulWidget {
 class __UserAttributionState extends State<_UserAttribution> {
   String name;
 
-  final List<String> quotes = [
+  final List<String> _quotes = [
     'Motivation gets you going and habit gets you there.',
     'Best way to break a habit is to drop it.',
     '21 days from now, you will thank yourself.',
@@ -88,9 +88,12 @@ class __UserAttributionState extends State<_UserAttribution> {
     'Will it be easy ? Nope. Worth it ? Absolutely!'
   ];
 
+  String selectedQuote;
+
   @override
   void initState() {
     super.initState();
+    selectedQuote = _quotes[Random().nextInt(4)];
     _loadName();
   }
 
@@ -122,7 +125,7 @@ class __UserAttributionState extends State<_UserAttribution> {
 
           // Today's motivational Quote
           Text(
-            quotes[Random().nextInt(4)],
+            selectedQuote ?? '',
             textAlign: TextAlign.left,
             style: TextStyle(
               fontWeight: FontWeight.w300,
