@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:twenty_one_days/screens/goals_list/goals_list.models.dart';
+import 'package:twenty_one_days/utilities/push_helper.dart';
 import 'package:twenty_one_days/utilities/storage_helper.dart';
 import 'package:twenty_one_days/utilities/utilities.dart';
 
@@ -48,12 +49,17 @@ class _GoalProgressWidgetState extends State<GoalProgressWidget>
 
     final _timeChooser = () async {
       final TimeOfDay _timeToRemind = await showTimePicker(
-          context: context, initialTime: TimeOfDay(hour: 7, minute: 0));
+          context: context,
+          initialTime:
+              TimeOfDay(hour: timeToRemind.hour, minute: timeToRemind.minute));
       if (_timeToRemind != null) {
         setState(() {
           widget.goal.remindAt = timeToRemind = _timeToRemind;
           StorageHelper().updateGoal(widget.goal);
+          Utils.publishUpdate(widget.goal);
         });
+        await PushHelper().cancelNotification(widget.goal.id);
+        await PushHelper().scheduleNotification(widget.goal);
       }
     };
 
@@ -70,6 +76,24 @@ class _GoalProgressWidgetState extends State<GoalProgressWidget>
               color: Colors.black87),
           textAlign: TextAlign.center,
         ),
+
+        // Replacing With
+        widget.goal.replacingWith != null
+            ? Container(
+                margin: EdgeInsets.only(top: 16),
+                child: RichText(
+                    text: TextSpan(children: [
+                  TextSpan(
+                      text: 'instead, ',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
+                          color: Colors.black87)),
+                  TextSpan(
+                      text: widget.goal.replacingWith,
+                      style: TextStyle(fontSize: 20, color: Colors.black)),
+                ])))
+            : Container(),
 
         Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
           // Remind at
@@ -149,7 +173,7 @@ class _GoalProgressWidgetState extends State<GoalProgressWidget>
                   fontSize: 24,
                   color: Colors.black)),
           TextSpan(
-              text: ' days left',
+              text: ' ${daysLeft == 1 ? "day" : "days"} left',
               style: TextStyle(fontSize: 24, color: Colors.black54)),
         ])),
       ],

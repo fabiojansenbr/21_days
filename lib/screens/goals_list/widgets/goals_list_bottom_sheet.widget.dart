@@ -8,6 +8,7 @@ class AddGoalBottomSheetWidget extends StatefulWidget {
 }
 
 class _AddGoalBottomSheetState extends State<AddGoalBottomSheetWidget> {
+  PageController _pageViewController = PageController();
   TimeOfDay timeToRemind;
   String title;
   String replacingWith;
@@ -40,69 +41,110 @@ class _AddGoalBottomSheetState extends State<AddGoalBottomSheetWidget> {
             color: Colors.white,
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(8), topRight: Radius.circular(8))),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            Row(
-              children: <Widget>[
+        child: PageView(
+          controller: _pageViewController,
+          physics: NeverScrollableScrollPhysics(),
+          children: [
+            // Goal Title
+            Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
+              Row(children: <Widget>[
                 // Title TextField
                 Expanded(
-                  child: TextField(
-                    // onEditingComplete: () => _timeChooser(),
-                    onChanged: (value) => title = value,
-                    autofocus: true,
-                    decoration: InputDecoration(
-                        hintText: 'Add a new goal', border: InputBorder.none),
-                  ),
+                    child: TextField(
+                  // onEditingComplete: () => _timeChooser(),
+                  onChanged: (value) => title = value,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                      hintText: 'Add a new goal', border: InputBorder.none),
+                ))
+              ]),
+
+              // Submit  Button
+              Row(children: <Widget>[
+                Spacer(flex: 1),
+
+                // Save Button
+                FlatButton(
+                  textColor: AppColors.PRIMARY,
+                  child: Text('Next', style: TextStyle(fontSize: 16)),
+                  onPressed: () => title != null
+                      ? _pageViewController.nextPage(
+                          duration: Duration(milliseconds: 200),
+                          curve: Curves.easeIn)
+                      : null,
                 )
-              ],
-            ),
+              ])
+            ]),
 
-            // Row(
-            //   children: <Widget>[
-            //     // Replace with TextField
-            //     Expanded(
-            //       child: TextField(
-            //         // onEditingComplete: () => _timeChooser(),
-            //         onChanged: (value) => replacingWith = value,
-            //         decoration: InputDecoration(
-            //             hintText: 'Replace with (Optional)',
-            //             border: InputBorder.none),
-            //       ),
-            //     )
-            //   ],
-            // ),
+            // Replace with
+            Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
+              Row(children: <Widget>[
+                // Title TextField
+                Expanded(
+                    child: TextField(
+                  // onEditingComplete: () => _timeChooser(),
+                  onChanged: (value) => replacingWith = value,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                      hintText: 'Replacing with (optional)',
+                      border: InputBorder.none),
+                ))
+              ]),
 
-            // Submit  Button
-            Row(children: <Widget>[
-              // Remind at
-              Opacity(opacity: 0.72, child: Text('Remind At:')),
+              // Submit  Button
+              Row(children: <Widget>[
+                Spacer(flex: 1),
 
-              timeToRemind == null
-                  ? FlatButton.icon(
-                      textColor: AppColors.PRIMARY,
-                      icon: Icon(Icons.calendar_today, size: 14),
-                      label: Text('Choose'),
-                      onPressed: _timeChooser)
-                  : FlatButton(
-                      child: Text(timeToRemind.format(context)),
-                      onPressed: _timeChooser),
+                // Save Button
+                FlatButton(
+                  textColor: AppColors.PRIMARY,
+                  child: Text('Next', style: TextStyle(fontSize: 16)),
+                  onPressed: () => _pageViewController.nextPage(
+                      duration: Duration(milliseconds: 200),
+                      curve: Curves.easeIn),
+                )
+              ])
+            ]),
 
-              Spacer(flex: 1),
+            // Remind At
+            Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
+              Row(children: <Widget>[
+                // Title TextField
+                Opacity(opacity: 0.72, child: Text('Remind At:')),
 
-              // Save Button
-              FlatButton(
+                timeToRemind == null
+                    ? FlatButton.icon(
+                        textColor: AppColors.PRIMARY,
+                        icon: Icon(Icons.calendar_today, size: 14),
+                        label: Text('Choose'),
+                        onPressed: _timeChooser)
+                    : FlatButton(
+                        child: Text(timeToRemind.format(context)),
+                        onPressed: _timeChooser),
+
+                Spacer(flex: 1)
+              ]),
+
+              // Submit  Button
+              Row(children: <Widget>[
+                Spacer(flex: 1),
+
+                // Save Button
+                FlatButton(
                   textColor: AppColors.PRIMARY,
                   child: Text('Save', style: TextStyle(fontSize: 16)),
-                  onPressed: title != null && timeToRemind != null
-                      ? () {
-                          Navigator.pop(context, Goal(title, timeToRemind));
-                        }
-                      : null)
+                  onPressed: timeToRemind != null ? _onSubmit : null,
+                )
+              ])
             ])
           ],
         ),
       ),
     );
+  }
+
+  _onSubmit() {
+    Navigator.pop(
+        context, Goal(title, timeToRemind, replacingWith: replacingWith));
   }
 }

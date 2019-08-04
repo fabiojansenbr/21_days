@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:twenty_one_days/screens/goal_details/goal_details.screen.dart';
+import 'package:twenty_one_days/constants.dart';
 import 'package:twenty_one_days/screens/goals_list/goals_list.models.dart';
 import 'package:twenty_one_days/utilities/storage_helper.dart';
 
@@ -23,7 +23,7 @@ class PushHelper {
     flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
     // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
     var initializationSettingsAndroid =
-        new AndroidInitializationSettings('@mipmap/ic_launcher');
+        new AndroidInitializationSettings('@drawable/ic_snotification');
     var initializationSettingsIOS = new IOSInitializationSettings();
     var initializationSettings = new InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
@@ -38,12 +38,8 @@ class PushHelper {
 
     final Goal goal = await StorageHelper().fetchGoalById(int.parse(payload));
     await canNavigate.future;
-    await Navigator.push(
-      context,
-      new MaterialPageRoute(
-          builder: (context) => GoalsDetailsScreen(),
-          settings: RouteSettings(arguments: GoalDetailArgument(goal: goal))),
-    );
+    await Navigator.pushNamed(context, AppRoutes.GOALS_DETAILS,
+        arguments: GoalDetailArgument(goal: goal));
   }
 
   scheduleNotification(Goal goal) async {

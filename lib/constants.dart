@@ -19,3 +19,8 @@ class StorageKeys {
   static const String avatar = 'avatar';
   static const String goalsCompleted = 'goalsCompleted';
 }
+
+class CustomEvents {
+  static const String goalDeleted = 'GOAL_DELETED';
+  static const String goalUpdated = 'GOAL_UPDATED';
+}

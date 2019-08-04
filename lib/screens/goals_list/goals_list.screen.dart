@@ -1,9 +1,11 @@
+import 'dart:async';
+
+import 'package:broadcast_events/broadcast_events.dart';
 import 'package:flutter/material.dart';
 
 import 'package:scoped_model/scoped_model.dart';
 
 import 'package:twenty_one_days/constants.dart';
-import 'package:twenty_one_days/screens/goal_details/goal_details.screen.dart';
 import 'package:twenty_one_days/screens/goal_details/widgets/day_complete_dialog.widget.dart';
 import 'package:twenty_one_days/screens/goals_list/goals_list.models.dart';
 import 'package:twenty_one_days/screens/goals_list/goals_list.view_model.dart';
@@ -26,10 +28,16 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
   @override
   void initState() {
     super.initState();
-
     _controller.addListener(_computeAppTitleVisibilty);
-
     model = GoalsListViewModel();
+    Timer.periodic(Duration(seconds: 1), (Timer t) {
+      setState(() {});
+    });
+
+    BroadcastEvents()
+        .subscribe<GoalEventArgument>(CustomEvents.goalDeleted, _onGoalDelete);
+    BroadcastEvents()
+        .subscribe<GoalEventArgument>(CustomEvents.goalUpdated, _onGoalUpdate);
   }
 
   _computeAppTitleVisibilty() {
@@ -139,25 +147,16 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
       model.goals.forEach((goal) {
         int daysLeft = Utils.getDaysLeft(goal);
         _children.add(InkWell(
-          onTap: () async {
-            GoalDetailResponse res = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => GoalsDetailsScreen(),
-                    settings: RouteSettings(
-                        arguments: GoalDetailArgument(goal: goal))));
-
-            if (res != null && res.isGoalDeleted) {
-              model.removeGoal(res.goal);
-            }
-          },
+          onTap: () => Navigator.pushNamed(context, AppRoutes.GOALS_DETAILS,
+              arguments: GoalDetailArgument(goal: goal)),
           child: ListTile(
               leading: CircularProgressIndicator(
                 value: Utils.getProgressValue(daysLeft),
                 backgroundColor: Colors.black26,
               ),
               title: Text(goal.title ?? ''),
-              subtitle: Text('$daysLeft days left'),
+              subtitle:
+                  Text('$daysLeft ${daysLeft == 1 ? "day" : "days"} left'),
               trailing: Utils.canMarkAsComplete(goal)
                   ? IconButton(
                       icon: Icon(Icons.done),
@@ -186,8 +185,8 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
   }
 
   _markAsComplete(Goal goal) async {
-    goal.lastMarkAsCompletedAt = DateTime.now().millisecondsSinceEpoch;
     final bool are21DaysOver = Utils.getDaysLeft(goal) == 1;
+    goal.lastMarkAsCompletedAt = DateTime.now().millisecondsSinceEpoch;
     await StorageHelper().updateGoal(goal);
     await showDialog(
         context: context,
@@ -204,5 +203,28 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
     StorageHelper().deleteGoal(goal.id);
     PushHelper().cancelNotification(goal.id);
     model.goals.remove(goal);
+  }
+
+  _onGoalDelete(GoalEventArgument goalDeleted) {
+    if (goalDeleted != null) {
+      Goal goalToRemove =
+          model.goals.firstWhere((goal) => goalDeleted.goal.id == goal.id);
+      model.removeGoal(goalToRemove);
+    }
+  }
+
+  _onGoalUpdate(GoalEventArgument goalUpdated) {
+    if (goalUpdated != null) {
+      model.updateGoal(goalUpdated.goal);
+    }
+  }
+
+  @override
+  void dispose() {
+    BroadcastEvents()
+        .unsubscribe(CustomEvents.goalDeleted, handler: _onGoalDelete);
+    BroadcastEvents()
+        .unsubscribe(CustomEvents.goalUpdated, handler: _onGoalUpdate);
+    super.dispose();
   }
 }

@@ -34,4 +34,10 @@ class GoalsListViewModel extends Model {
     goals.remove(goal);
     notifyListeners();
   }
+
+  updateGoal(Goal goal) {
+    int goalToUpdateIndex = goals.indexWhere((_goal) => goal.id == _goal.id);
+    goals[goalToUpdateIndex] = goal;
+    notifyListeners();
+  }
 }

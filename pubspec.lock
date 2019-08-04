@@ -15,6 +15,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
+  broadcast_events:
+    dependency: "direct main"
+    description:
+      name: broadcast_events
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0+1"
   charcode:
     dependency: transitive
     description:

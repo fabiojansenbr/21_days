@@ -1,3 +1,4 @@
+import 'package:broadcast_events/broadcast_events.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:twenty_one_days/constants.dart';
@@ -40,7 +41,9 @@ class _GoalsDetailsScreenState extends State<GoalsDetailsScreen> {
   _deleteGoal() {
     StorageHelper().deleteGoal(args.goal.id);
     PushHelper().cancelNotification(args.goal.id);
-    Navigator.of(context).pop(GoalDetailResponse(args.goal, true));
+    BroadcastEvents().publish<GoalEventArgument>(CustomEvents.goalDeleted,
+        arguments: GoalEventArgument(args.goal));
+    Navigator.of(context).pop();
   }
 
   Widget get _scrollableContent {
@@ -113,13 +116,14 @@ class _GoalsDetailsScreenState extends State<GoalsDetailsScreen> {
     if (startAgain) {
       goal.start = DateTime.now().millisecondsSinceEpoch;
       await StorageHelper().updateGoal(goal);
+      Utils.publishUpdate(goal);
       setState(() {});
     }
   }
 
   _markAsComplete(Goal goal) async {
-    goal.lastMarkAsCompletedAt = DateTime.now().millisecondsSinceEpoch;
     final bool are21DaysOver = Utils.getDaysLeft(goal) == 1;
+    goal.lastMarkAsCompletedAt = DateTime.now().millisecondsSinceEpoch;
     await StorageHelper().updateGoal(goal);
     await showDialog(
         context: context,
@@ -128,6 +132,9 @@ class _GoalsDetailsScreenState extends State<GoalsDetailsScreen> {
         });
     if (are21DaysOver) {
       _deleteGoal();
+    } else {
+      Utils.publishUpdate(goal);
+      setState(() {});
     }
   }
 }

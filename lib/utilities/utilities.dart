@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:broadcast_events/broadcast_events.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:twenty_one_days/constants.dart';
 import 'package:twenty_one_days/screens/goals_list/goals_list.models.dart';
 
 class Utils {
@@ -49,6 +51,23 @@ class Utils {
     return notMarkedToday && isCurrentTimeAfterRemindTime;
   }
 
+  static bool hasUnresolvedProgressInDays(Goal goal) {
+    DateTime now = DateTime.now();
+    DateTime startedAt = DateTime.fromMillisecondsSinceEpoch(goal.start);
+    if (goal.lastMarkAsCompletedAt == null &&
+        now.difference(startedAt).inDays > 1) {
+      return true;
+    } else {
+      DateTime lastMarkedAt =
+          DateTime.fromMillisecondsSinceEpoch(goal.lastMarkAsCompletedAt);
+      if (now.difference(lastMarkedAt).inDays > 1) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
   static Future<bool> showConfirm(BuildContext context, String title) async {
     Completer<bool> _completer = Completer<bool>();
     showDialog<bool>(
@@ -74,5 +93,10 @@ class Utils {
           ]);
         });
     return _completer.future;
+  }
+
+  static publishUpdate(Goal goal) {
+    BroadcastEvents().publish<GoalEventArgument>(CustomEvents.goalUpdated,
+        arguments: GoalEventArgument(goal));
   }
 }

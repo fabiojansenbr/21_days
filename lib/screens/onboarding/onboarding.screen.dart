@@ -206,7 +206,7 @@ class _SlidesIndicator extends StatelessWidget {
           ),
           onPressed: isLastIndex
               ? () {
-                  Navigator.of(context).pushNamed(AppRoutes.LOGIN);
+                  Navigator.of(context).pushReplacementNamed(AppRoutes.LOGIN);
                 }
               : changePageTrigger,
         ));

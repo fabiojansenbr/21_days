@@ -10,7 +10,8 @@ class Goal {
 
   Goal(this.title, this.remindAt, {this.replacingWith}) {
     start = DateTime.now().millisecondsSinceEpoch;
-    // start = (DateTime.now().subtract(Duration(days: 20))).millisecondsSinceEpoch;
+    // start =
+    //     (DateTime.now().subtract(Duration(days: 20))).millisecondsSinceEpoch;
   }
 
   Goal.fromDbJson(Map<String, dynamic> dbJson) {
@@ -41,12 +42,12 @@ class Goal {
   DateTime get remindAtDateTime {
     final now = DateTime.now();
     final started = DateTime.fromMillisecondsSinceEpoch(start);
-    if (started.hour >= now.hour && started.day == now.day) {
-      return DateTime(started.year, started.month, started.day, remindAt.hour,
-          remindAt.minute);
+    if (remindAt.hour >= now.hour && now.difference(started).inDays >= 0) {
+      return DateTime(
+          now.year, now.month, now.day, remindAt.hour, remindAt.minute);
     } else {
-      return DateTime(started.year, started.month, started.day + 1,
-          remindAt.hour, remindAt.minute);
+      return DateTime(
+          now.year, now.month, now.day + 1, remindAt.hour, remindAt.minute);
     }
   }
 }
@@ -62,4 +63,9 @@ class GoalDetailResponse {
   final bool isGoalDeleted;
 
   GoalDetailResponse(this.goal, this.isGoalDeleted);
+}
+
+class GoalEventArgument {
+  final Goal goal;
+  GoalEventArgument(this.goal);
 }
