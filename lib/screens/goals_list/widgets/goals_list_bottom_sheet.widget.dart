@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:twenty_one_days/constants.dart';
 import 'package:twenty_one_days/screens/goals_list/goals_list.models.dart';
 
@@ -46,97 +47,123 @@ class _AddGoalBottomSheetState extends State<AddGoalBottomSheetWidget> {
           physics: NeverScrollableScrollPhysics(),
           children: [
             // Goal Title
-            Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
-              Row(children: <Widget>[
-                // Title TextField
-                Expanded(
-                    child: TextField(
-                  // onEditingComplete: () => _timeChooser(),
-                  onChanged: (value) => title = value,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                      hintText: 'Add a new goal', border: InputBorder.none),
-                ))
-              ]),
+            Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  // Label
+                  Text(
+                    'Enter a new Goal or Habbit to break (eg. Quit Smoking)',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                  ),
 
-              // Submit  Button
-              Row(children: <Widget>[
-                Spacer(flex: 1),
+                  Row(children: <Widget>[
+                    // Title TextField
+                    Expanded(
+                        child: TextField(
+                      // onEditingComplete: () => _timeChooser(),
+                      onChanged: (value) => title = value,
+                      autofocus: true,
+                      decoration: InputDecoration(
+                          hintText: 'Add a new goal', border: InputBorder.none),
+                    ))
+                  ]),
 
-                // Save Button
-                FlatButton(
-                  textColor: AppColors.PRIMARY,
-                  child: Text('Next', style: TextStyle(fontSize: 16)),
-                  onPressed: () => title != null
-                      ? _pageViewController.nextPage(
-                          duration: Duration(milliseconds: 200),
-                          curve: Curves.easeIn)
-                      : null,
-                )
-              ])
-            ]),
+                  // Submit  Button
+                  Row(children: <Widget>[
+                    Spacer(flex: 1),
+
+                    // Save Button
+                    FlatButton(
+                      textColor: AppColors.PRIMARY,
+                      child: Text('Next', style: TextStyle(fontSize: 16)),
+                      onPressed: () => title != null
+                          ? _pageViewController.nextPage(
+                              duration: Duration(milliseconds: 200),
+                              curve: Curves.easeIn)
+                          : null,
+                    )
+                  ])
+                ]),
 
             // Replace with
-            Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
-              Row(children: <Widget>[
-                // Title TextField
-                Expanded(
-                    child: TextField(
-                  // onEditingComplete: () => _timeChooser(),
-                  onChanged: (value) => replacingWith = value,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                      hintText: 'Replacing with (optional)',
-                      border: InputBorder.none),
-                ))
-              ]),
+            Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  // Label
+                  Text(
+                    'New habbit to replace it with (eg. Chew a gum)',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                  ),
 
-              // Submit  Button
-              Row(children: <Widget>[
-                Spacer(flex: 1),
+                  Row(children: <Widget>[
+                    // Title TextField
+                    Expanded(
+                        child: TextField(
+                      // onEditingComplete: () => _timeChooser(),
+                      onChanged: (value) => replacingWith = value,
+                      autofocus: true,
+                      decoration: InputDecoration(
+                          hintText: 'Replacing with (optional)',
+                          border: InputBorder.none),
+                    ))
+                  ]),
 
-                // Save Button
-                FlatButton(
-                  textColor: AppColors.PRIMARY,
-                  child: Text('Next', style: TextStyle(fontSize: 16)),
-                  onPressed: () => _pageViewController.nextPage(
-                      duration: Duration(milliseconds: 200),
-                      curve: Curves.easeIn),
-                )
-              ])
-            ]),
+                  // Submit  Button
+                  Row(children: <Widget>[
+                    Spacer(flex: 1),
+
+                    // Save Button
+                    FlatButton(
+                      textColor: AppColors.PRIMARY,
+                      child: Text('Next', style: TextStyle(fontSize: 16)),
+                      onPressed: () => _pageViewController.nextPage(
+                          duration: Duration(milliseconds: 200),
+                          curve: Curves.easeIn),
+                    )
+                  ])
+                ]),
 
             // Remind At
-            Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
-              Row(children: <Widget>[
-                // Title TextField
-                Opacity(opacity: 0.72, child: Text('Remind At:')),
+            Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'We will remind you daily at the time you choose',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                  ),
 
-                timeToRemind == null
-                    ? FlatButton.icon(
-                        textColor: AppColors.PRIMARY,
-                        icon: Icon(Icons.calendar_today, size: 14),
-                        label: Text('Choose'),
-                        onPressed: _timeChooser)
-                    : FlatButton(
-                        child: Text(timeToRemind.format(context)),
-                        onPressed: _timeChooser),
+                  Row(children: <Widget>[
+                    // Title TextField
+                    Opacity(opacity: 0.72, child: Text('Remind At:')),
 
-                Spacer(flex: 1)
-              ]),
+                    timeToRemind == null
+                        ? FlatButton.icon(
+                            textColor: AppColors.PRIMARY,
+                            icon: Icon(Icons.calendar_today, size: 14),
+                            label: Text('Choose'),
+                            onPressed: _timeChooser)
+                        : FlatButton(
+                            child: Text(timeToRemind.format(context)),
+                            onPressed: _timeChooser),
 
-              // Submit  Button
-              Row(children: <Widget>[
-                Spacer(flex: 1),
+                    Spacer(flex: 1)
+                  ]),
 
-                // Save Button
-                FlatButton(
-                  textColor: AppColors.PRIMARY,
-                  child: Text('Save', style: TextStyle(fontSize: 16)),
-                  onPressed: timeToRemind != null ? _onSubmit : null,
-                )
-              ])
-            ])
+                  // Submit  Button
+                  Row(children: <Widget>[
+                    Spacer(flex: 1),
+
+                    // Save Button
+                    FlatButton(
+                      textColor: AppColors.PRIMARY,
+                      child: Text('Save', style: TextStyle(fontSize: 16)),
+                      onPressed: timeToRemind != null ? _onSubmit : null,
+                    )
+                  ])
+                ])
           ],
         ),
       ),
