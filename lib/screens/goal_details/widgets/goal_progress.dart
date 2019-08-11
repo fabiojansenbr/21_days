@@ -37,7 +37,7 @@ class _GoalProgressWidgetState extends State<GoalProgressWidget>
   @override
   Widget build(BuildContext context) {
     int daysLeft = Utils.getDaysLeft(widget.goal);
-    double progressWidth = MediaQuery.of(context).size.width * 0.64;
+    double progressWidth = MediaQuery.of(context).size.width * 0.60;
     double percentage = Utils.getProgressValue(daysLeft);
 
     this.valueTween = Tween<double>(
@@ -64,118 +64,141 @@ class _GoalProgressWidgetState extends State<GoalProgressWidget>
     };
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      // crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       // mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
         // Goal Title
         Text(
           widget.goal.title ?? '',
           style: TextStyle(
-              fontSize: 24,
-              // fontWeight: FontWeight.w500,
-              color: Colors.black87),
-          textAlign: TextAlign.center,
+              fontSize: 32,
+              fontWeight: FontWeight.w500,
+              // color: Colors.black87),
+              color: Colors.white),
+          textAlign: TextAlign.left,
         ),
 
         // Replacing With
         widget.goal.replacingWith != null
             ? Container(
-                margin: EdgeInsets.only(top: 16),
+                margin: EdgeInsets.only(top: 8),
                 child: RichText(
                     text: TextSpan(children: [
                   TextSpan(
-                      text: 'instead, ',
+                      text: 'instead,\n',
                       style: TextStyle(
                           fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                          color: Colors.black87)),
+                          fontSize: 24,
+                          color: Colors.white70)),
                   TextSpan(
                       text: widget.goal.replacingWith,
-                      style: TextStyle(fontSize: 20, color: Colors.black)),
+                      style: TextStyle(fontSize: 28, color: Colors.white)),
                 ])))
             : Container(),
 
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+        Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
           // Remind at
-          Opacity(opacity: 0.72, child: Text('Reminding At:')),
+          // Opacity(opacity: 0.72, child: Text('Reminding At:')),
+          Icon(Icons.calendar_today, size: 18, color: Colors.white),
 
-          timeToRemind == null
-              ? FlatButton.icon(
-                  textColor: AppColors.PRIMARY,
-                  icon: Icon(Icons.calendar_today, size: 14),
-                  label: Text('Choose'),
-                  onPressed: _timeChooser)
-              : FlatButton(
-                  child: Text(timeToRemind.format(context)),
-                  onPressed: _timeChooser),
+          // timeToRemind == null
+          //     ? FlatButton.icon(
+          //         textColor: AppColors.PRIMARY,
+          //         icon: Icon(Icons.calendar_today, size: 14),
+          //         label: Text('Choose'),
+          //         onPressed: _timeChooser)
+          //     :
+          FlatButton(
+              textColor: Colors.white,
+              child: Text(
+                timeToRemind.format(context),
+                style: TextStyle(fontSize: 20),
+              ),
+              onPressed: _timeChooser),
         ]),
 
         // Spacer
-        SizedBox(height: 40),
+        SizedBox(height: 48),
 
         // Goal Progress
-        Container(
-            height: progressWidth,
-            width: progressWidth,
-            child: Stack(
-              children: <Widget>[
-                // Progress Bar
-                Container(
-                  width: progressWidth,
-                  height: progressWidth,
-                  child: AnimatedBuilder(
-                      animation: this.curve,
-                      builder: (context, child) {
-                        return CircularProgressIndicator(
-                            strokeWidth: 16,
-                            backgroundColor: Colors.black12,
-                            value: this.valueTween.evaluate(this.curve));
-                      }),
-                ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                      height: progressWidth,
+                      width: progressWidth,
+                      child: Stack(
+                        children: <Widget>[
+                          // Progress Bar
+                          Container(
+                            width: progressWidth,
+                            height: progressWidth,
+                            child: AnimatedBuilder(
+                                animation: this.curve,
+                                builder: (context, child) {
+                                  return CircularProgressIndicator(
+                                      strokeWidth: 20,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Color(0xeeffffff)),
+                                      backgroundColor: Colors.black12,
+                                      value:
+                                          this.valueTween.evaluate(this.curve));
+                                }),
+                          ),
 
-                // Percentage
-                Container(
-                  height: progressWidth,
-                  width: progressWidth,
-                  child: Center(
-                      child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      AnimatedBuilder(
-                          animation: this._controller,
-                          builder: (context, child) {
-                            return Text(
-                              '${(this.valueTween.evaluate(this.curve) * 100).truncate()}%',
-                              style: TextStyle(fontSize: 40),
-                            );
-                          }),
-                      // Text(
-                      //   '${(percentage * 100).truncate()}%',
-                      //   style: TextStyle(fontSize: 40),
-                      // ),
-                      Text('CONQUERED', style: TextStyle(fontSize: 12))
-                    ],
-                  )),
-                )
-              ],
-            )),
+                          // Percentage
+                          Container(
+                            height: progressWidth,
+                            width: progressWidth,
+                            child: Center(
+                                child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                AnimatedBuilder(
+                                    animation: this._controller,
+                                    builder: (context, child) {
+                                      return Text(
+                                        '${(this.valueTween.evaluate(this.curve) * 100).truncate()}%',
+                                        style: TextStyle(
+                                            fontSize: 40, color: Colors.white),
+                                      );
+                                    }),
+                                // Text(
+                                //   '${(percentage * 100).truncate()}%',
+                                //   style: TextStyle(fontSize: 40),
+                                // ),
+                                Text('CONQUERED',
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.white))
+                              ],
+                            )),
+                          )
+                        ],
+                      )),
 
-        //Spacer
-        SizedBox(height: 40),
+                  //Spacer
+                  SizedBox(height: 40),
 
-        // Days Remaining
-        RichText(
-            text: TextSpan(children: [
-          TextSpan(
-              text: '$daysLeft',
-              style: TextStyle(
-                  fontWeight: FontWeight.w400,
-                  fontSize: 24,
-                  color: Colors.black)),
-          TextSpan(
-              text: ' ${daysLeft == 1 ? "day" : "days"} left',
-              style: TextStyle(fontSize: 24, color: Colors.black54)),
-        ])),
+                  // Days Remaining
+                  RichText(
+                      text: TextSpan(children: [
+                    TextSpan(
+                        text: '$daysLeft',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 24,
+                            color: Colors.white)),
+                    TextSpan(
+                        text: ' ${daysLeft == 1 ? "day" : "days"} left',
+                        style: TextStyle(fontSize: 24, color: Colors.white54)),
+                  ]))
+                ]),
+          ],
+        ),
       ],
     );
   }

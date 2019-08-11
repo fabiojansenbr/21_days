@@ -25,13 +25,17 @@ class Utils {
     int difference = now.difference(start).inDays;
     int daysLeft = 21 - (difference > 0 ? difference : 0);
     // return daysLeft;
-    DateTime marked =
-        DateTime.fromMillisecondsSinceEpoch(goal.lastMarkAsCompletedAt ?? 0);
-    return marked.day == now.day ? daysLeft - 1 : daysLeft;
+    DateTime marked = goal.lastMarkAsCompletedAt != null
+        ? DateTime.fromMillisecondsSinceEpoch(goal.lastMarkAsCompletedAt)
+        : null;
+    final int totalDaysLeft =
+        (marked != null && marked.day == now.day) ? daysLeft - 1 : daysLeft;
+    return totalDaysLeft >= 0 ? totalDaysLeft : 0;
   }
 
   static double getProgressValue(int daysLeft) {
-    return ((21 - daysLeft) / 21) + 0.001;
+    final double progress = ((21 - daysLeft) / 21) + 0.001;
+    return progress <= 1 ? progress : 1;
   }
 
   static bool canMarkAsComplete(Goal goal) {
@@ -51,19 +55,25 @@ class Utils {
     return notMarkedToday && isCurrentTimeAfterRemindTime;
   }
 
-  static bool hasUnresolvedProgressInDays(Goal goal) {
+  static int getUnresolvedProgressInDays(Goal goal) {
     DateTime now = DateTime.now();
     DateTime startedAt = DateTime.fromMillisecondsSinceEpoch(goal.start);
-    if (goal.lastMarkAsCompletedAt == null &&
-        now.difference(startedAt).inDays > 1) {
-      return true;
+    if (goal.lastMarkAsCompletedAt == null) {
+      // return true;
+      if (now.difference(startedAt).inDays > 1) {
+        return now.difference(startedAt).inDays;
+      } else {
+        return 0;
+      }
     } else {
       DateTime lastMarkedAt =
           DateTime.fromMillisecondsSinceEpoch(goal.lastMarkAsCompletedAt);
       if (now.difference(lastMarkedAt).inDays > 1) {
-        return true;
+        // return true;
+        return now.difference(lastMarkedAt).inDays;
       } else {
-        return false;
+        // return false;
+        return 0;
       }
     }
   }

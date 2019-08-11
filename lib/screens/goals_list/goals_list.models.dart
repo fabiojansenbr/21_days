@@ -42,12 +42,19 @@ class Goal {
   DateTime get remindAtDateTime {
     final now = DateTime.now();
     final started = DateTime.fromMillisecondsSinceEpoch(start);
+    // if (remindAt.hour >= now.hour && now.difference(started).inDays >= 0) {
+    //   return DateTime(
+    //       now.year, now.month, now.day, remindAt.hour, remindAt.minute);
+    // } else {
+    //   return DateTime(
+    //       now.year, now.month, now.day + 1, remindAt.hour, remindAt.minute);
+    // }
     if (remindAt.hour >= now.hour && now.difference(started).inDays >= 0) {
-      return DateTime(
-          now.year, now.month, now.day, remindAt.hour, remindAt.minute);
+      return DateTime(started.year, started.month, started.day, remindAt.hour,
+          remindAt.minute);
     } else {
-      return DateTime(
-          now.year, now.month, now.day + 1, remindAt.hour, remindAt.minute);
+      return DateTime(started.year, started.month, started.day + 1,
+          remindAt.hour, remindAt.minute);
     }
   }
 }

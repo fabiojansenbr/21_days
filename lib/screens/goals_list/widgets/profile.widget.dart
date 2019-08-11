@@ -55,7 +55,9 @@ class __ProfilePictureWidgetState extends State<_ProfilePictureWidget> {
 
   _getAvatar() async {
     isMaleAvatar = await StorageHelper().getAvatar();
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -99,7 +101,9 @@ class __UserAttributionState extends State<_UserAttribution> {
 
   _loadName() async {
     name = await StorageHelper().getName();
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override

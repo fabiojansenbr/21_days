@@ -14,6 +14,8 @@ class _AddGoalBottomSheetState extends State<AddGoalBottomSheetWidget> {
   String title;
   String replacingWith;
 
+  FocusNode _replaceWithFocusNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
     final _timeChooser = () async {
@@ -45,6 +47,13 @@ class _AddGoalBottomSheetState extends State<AddGoalBottomSheetWidget> {
         child: PageView(
           controller: _pageViewController,
           physics: NeverScrollableScrollPhysics(),
+          onPageChanged: (index) {
+            if (index == 2) {
+              FocusScope.of(context).requestFocus(FocusNode());
+            } else if (index == 1) {
+              FocusScope.of(context).requestFocus(_replaceWithFocusNode);
+            }
+          },
           children: [
             // Goal Title
             Column(
@@ -61,7 +70,8 @@ class _AddGoalBottomSheetState extends State<AddGoalBottomSheetWidget> {
                     // Title TextField
                     Expanded(
                         child: TextField(
-                      // onEditingComplete: () => _timeChooser(),
+                      onEditingComplete: () =>
+                          title != null ? _goToNextPage() : null,
                       onChanged: (value) => title = value,
                       autofocus: true,
                       decoration: InputDecoration(
@@ -77,11 +87,7 @@ class _AddGoalBottomSheetState extends State<AddGoalBottomSheetWidget> {
                     FlatButton(
                       textColor: AppColors.PRIMARY,
                       child: Text('Next', style: TextStyle(fontSize: 16)),
-                      onPressed: () => title != null
-                          ? _pageViewController.nextPage(
-                              duration: Duration(milliseconds: 200),
-                              curve: Curves.easeIn)
-                          : null,
+                      onPressed: () => title != null ? _goToNextPage() : null,
                     )
                   ])
                 ]),
@@ -101,9 +107,10 @@ class _AddGoalBottomSheetState extends State<AddGoalBottomSheetWidget> {
                     // Title TextField
                     Expanded(
                         child: TextField(
-                      // onEditingComplete: () => _timeChooser(),
+                      onEditingComplete: () => _goToNextPage(),
                       onChanged: (value) => replacingWith = value,
                       autofocus: true,
+                      focusNode: _replaceWithFocusNode,
                       decoration: InputDecoration(
                           hintText: 'Replacing with (optional)',
                           border: InputBorder.none),
@@ -118,9 +125,7 @@ class _AddGoalBottomSheetState extends State<AddGoalBottomSheetWidget> {
                     FlatButton(
                       textColor: AppColors.PRIMARY,
                       child: Text('Next', style: TextStyle(fontSize: 16)),
-                      onPressed: () => _pageViewController.nextPage(
-                          duration: Duration(milliseconds: 200),
-                          curve: Curves.easeIn),
+                      onPressed: () => _goToNextPage(),
                     )
                   ])
                 ]),
@@ -168,6 +173,11 @@ class _AddGoalBottomSheetState extends State<AddGoalBottomSheetWidget> {
         ),
       ),
     );
+  }
+
+  _goToNextPage() {
+    _pageViewController.nextPage(
+        duration: Duration(milliseconds: 200), curve: Curves.easeIn);
   }
 
   _onSubmit() {

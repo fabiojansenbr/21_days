@@ -30,9 +30,11 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
     super.initState();
     _controller.addListener(_computeAppTitleVisibilty);
     model = GoalsListViewModel();
-    Timer.periodic(Duration(seconds: 1), (Timer t) {
-      setState(() {});
-    });
+    // Timer.periodic(Duration(seconds: 1), (Timer t) {
+    //   if (mounted) {
+    //     setState(() {});
+    //   }
+    // });
 
     BroadcastEvents()
         .subscribe<GoalEventArgument>(CustomEvents.goalDeleted, _onGoalDelete);
@@ -42,13 +44,13 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
 
   _computeAppTitleVisibilty() {
     if (_controller.hasClients && _controller.offset > (200 - kToolbarHeight)) {
-      if (textHidden) {
+      if (textHidden && mounted) {
         setState(() {
           textHidden = false;
         });
       }
     } else {
-      if (!textHidden) {
+      if (!textHidden && mounted) {
         setState(() {
           textHidden = true;
         });
@@ -146,22 +148,27 @@ class _GoalsListScreenState extends State<GoalsListScreen> {
       // Add Children for Goals List
       model.goals.forEach((goal) {
         int daysLeft = Utils.getDaysLeft(goal);
-        _children.add(InkWell(
-          onTap: () => Navigator.pushNamed(context, AppRoutes.GOALS_DETAILS,
-              arguments: GoalDetailArgument(goal: goal)),
-          child: ListTile(
-              leading: CircularProgressIndicator(
-                value: Utils.getProgressValue(daysLeft),
-                backgroundColor: Colors.black26,
-              ),
-              title: Text(goal.title ?? ''),
-              subtitle:
-                  Text('$daysLeft ${daysLeft == 1 ? "day" : "days"} left'),
-              trailing: Utils.canMarkAsComplete(goal)
-                  ? IconButton(
-                      icon: Icon(Icons.done),
-                      onPressed: () => _markAsComplete(goal))
-                  : SizedBox(width: 48)),
+        int notMarkedIn = Utils.getUnresolvedProgressInDays(goal);
+        _children.add(Container(
+          color: notMarkedIn > 0 ? Color(0x12FC6681) : Colors.transparent,
+          child: InkWell(
+            onTap: () => Navigator.pushNamed(context, AppRoutes.GOALS_DETAILS,
+                arguments: GoalDetailArgument(goal: goal)),
+            child: ListTile(
+                leading: CircularProgressIndicator(
+                  value: Utils.getProgressValue(daysLeft),
+                  backgroundColor: Colors.black26,
+                ),
+                title: Text(goal.title ?? ''),
+                subtitle: notMarkedIn > 0
+                    ? Text('We haven\'t seen you in $notMarkedIn days')
+                    : Text('$daysLeft ${daysLeft == 1 ? "day" : "days"} left'),
+                trailing: Utils.canMarkAsComplete(goal)
+                    ? IconButton(
+                        icon: Icon(Icons.done),
+                        onPressed: () => _markAsComplete(goal))
+                    : SizedBox(width: 48)),
+          ),
         ));
       });
 

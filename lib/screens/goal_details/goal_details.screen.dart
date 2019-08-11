@@ -27,6 +27,7 @@ class _GoalsDetailsScreenState extends State<GoalsDetailsScreen> {
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
+          elevation: 0,
           title: Text('Goal Details'),
           actions: <Widget>[
             IconButton(
@@ -57,7 +58,8 @@ class _GoalsDetailsScreenState extends State<GoalsDetailsScreen> {
           constraints: BoxConstraints(
               minHeight: height, minWidth: viewportConstraints.maxWidth),
           child: Container(
-            color: Colors.white,
+            // color: Colors.white,
+            color: AppColors.PRIMARY,
             child: IntrinsicHeight(
               child: _getContent(context),
             ),
@@ -83,8 +85,8 @@ class _GoalsDetailsScreenState extends State<GoalsDetailsScreen> {
                 height: 48,
                 minWidth: 216,
                 child: RaisedButton(
-                  color: AppColors.PRIMARY,
-                  textColor: Colors.white,
+                  color: Colors.white,
+                  // textColor: Colors.white,
                   child: Text('Mark as Complete'),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(64)),
@@ -97,9 +99,10 @@ class _GoalsDetailsScreenState extends State<GoalsDetailsScreen> {
         Utils.canMarkAsComplete(args.goal)
             ? Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: FlatButton(
+                child: OutlineButton(
                   child: Text('Missed it! Start Again'),
-                  textColor: AppColors.PRIMARY,
+                  // textColor: AppColors.PRIMARY,
+                  textColor: Colors.white,
                   onPressed: () => _startAgain(args.goal),
                 ),
               )
