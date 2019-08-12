@@ -1,4 +1,4 @@
-package com.example.twenty_one_days;
+package com.deviation.twenty_one_days;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
